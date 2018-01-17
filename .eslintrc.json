@@ -1,0 +1,25 @@
+{
+  "env": {
+    "browser": true,
+    "es6": true,
+    "node": true
+  },
+  "extends": "airbnb",
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "experimentalObjectRestSpread": true,
+      "jsx": true
+    },
+    "sourceType": "module"
+  },
+  "plugins": ["react"],
+  "rules": {
+    "quotes": ["error", "double"],
+    "linebreak-style": "off",
+    "react/prop-types": "off",
+    "no-plusplus": "off",
+    "no-mixed-operators": "warn",
+    "no-empty": "warn"
+  }
+}

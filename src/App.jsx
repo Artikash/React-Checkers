@@ -16,6 +16,14 @@ class App extends React.Component {
       false,
     );
 
+  gameWinner = () => {
+    const winner = this.state.board
+      .map(row => row.map(piece => piece.substr(0, 1)).join(""))
+      .join("")
+      .match(/^([BW])\1*$/);
+    return winner ? winner[1] : winner;
+  };
+
   clickHandler = coordinates => () => {
     if (!this.state.movingFrom) {
       if (this.state.board[coordinates.y][coordinates.x].match(this.state.turn)) {
@@ -95,7 +103,14 @@ class App extends React.Component {
                 validMove={this.validMove({ y, x })}
               />
             )))}
-          <p>{`To move: ${this.state.turn}`}</p>
+          <div />
+          <div />
+          <div>{`To move: ${this.state.turn}`}</div>
+          <div />
+          <div />
+          <div>{`Winner: ${this.gameWinner() ? this.gameWinner() : "Undecided"}`}</div>
+          <div />
+          <div />
         </div>
       </div>
     );

@@ -64,7 +64,7 @@ class App extends React.Component {
         )}K`;
       }
       if (switchTurn) {
-        this.setState(this.state.turn === "W" ? "B" : "W");
+        this.setState({ turn: this.state.turn === "W" ? "B" : "W" });
       }
       this.setState({ movingFrom: null, validMoves: [], board });
     } else if (
@@ -96,7 +96,7 @@ class App extends React.Component {
               />
             )))}
         </div>
-        <p>`To move: ${this.state.turn}`</p>
+        <p>{`To move: ${this.state.turn}`}</p>
       </div>
     );
   }

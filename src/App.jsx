@@ -7,9 +7,8 @@ class App extends React.Component {
     board: StartingPosition,
     movingFrom: null,
     validMoves: [],
+    turn: "W",
   };
-
-  turn = "W";
 
   validMove = coordinates =>
     this.state.validMoves.reduce(
@@ -19,14 +18,14 @@ class App extends React.Component {
 
   clickHandler = coordinates => () => {
     if (!this.state.movingFrom) {
-      if (this.state.board[coordinates.y][coordinates.x].match(this.turn)) {
+      if (this.state.board[coordinates.y][coordinates.x].match(this.state.turn)) {
         const validMoves = [];
         const addValidMove = (offsets) => {
           try {
             if (this.state.board[coordinates.y + offsets.y][coordinates.x + offsets.x] === "") {
               validMoves.push({ y: coordinates.y + offsets.y, x: coordinates.x + offsets.x });
             } else if (
-              !this.state.board[coordinates.y + offsets.y][coordinates.x + offsets.x].match(this.turn) &&
+              !this.state.board[coordinates.y + offsets.y][coordinates.x + offsets.x].match(this.state.turn) &&
               this.state.board[coordinates.y + offsets.y * 2][coordinates.x + offsets.x * 2] === ""
             ) {
               validMoves.push({
@@ -36,23 +35,23 @@ class App extends React.Component {
             }
           } catch (error) {}
         };
-        if (this.turn === "W" || this.state.board[coordinates.y][coordinates.x].match("K")) {
+        if (this.state.turn === "W" || this.state.board[coordinates.y][coordinates.x].match("K")) {
           addValidMove({ y: -1, x: -1 });
           addValidMove({ y: -1, x: +1 });
         }
-        if (this.turn === "B" || this.state.board[coordinates.y][coordinates.x].match("K")) {
+        if (this.state.turn === "B" || this.state.board[coordinates.y][coordinates.x].match("K")) {
           addValidMove({ y: +1, x: -1 });
           addValidMove({ y: +1, x: +1 });
         }
         this.setState({ movingFrom: coordinates, validMoves });
       }
     } else if (this.validMove(coordinates)) {
-      this.turn = this.turn === "W" ? "B" : "W";
       const board = this.state.board.slice();
+      let switchTurn = true;
       board[coordinates.y][coordinates.x] = board[this.state.movingFrom.y][this.state.movingFrom.x];
       board[this.state.movingFrom.y][this.state.movingFrom.x] = "";
       if (Math.abs(this.state.movingFrom.y - coordinates.y) !== 1) {
-        this.turn = this.turn === "W" ? "B" : "W";
+        switchTurn = false;
         board[(this.state.movingFrom.y + coordinates.y) / 2][
           (this.state.movingFrom.x + coordinates.x) / 2
         ] =
@@ -63,6 +62,9 @@ class App extends React.Component {
           0,
           1,
         )}K`;
+      }
+      if (switchTurn) {
+        this.setState(this.state.turn === "W" ? "B" : "W");
       }
       this.setState({ movingFrom: null, validMoves: [], board });
     } else if (
@@ -94,6 +96,7 @@ class App extends React.Component {
               />
             )))}
         </div>
+        <p>`To move: ${this.state.turn}`</p>
       </div>
     );
   }

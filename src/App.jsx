@@ -95,8 +95,8 @@ class App extends React.Component {
                 validMove={this.validMove({ y, x })}
               />
             )))}
+          <p>{`To move: ${this.state.turn}`}</p>
         </div>
-        <p>{`To move: ${this.state.turn}`}</p>
       </div>
     );
   }

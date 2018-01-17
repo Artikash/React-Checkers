@@ -29,13 +29,13 @@ class App extends React.Component {
       if (this.state.board[coordinates.y][coordinates.x].match(this.state.turn)) {
         const validMoves = [];
         const addValidMove = (offsets) => {
-          try {
+          try { // Try block in case we access a value off the board
             if (this.state.board[coordinates.y + offsets.y][coordinates.x + offsets.x] === "") {
               validMoves.push({ y: coordinates.y + offsets.y, x: coordinates.x + offsets.x });
             } else if (
               !this.state.board[coordinates.y + offsets.y][coordinates.x + offsets.x].match(this.state.turn) &&
               this.state.board[coordinates.y + offsets.y * 2][coordinates.x + offsets.x * 2] === ""
-            ) {
+            ) { // If a piece is being captured
               validMoves.push({
                 y: coordinates.y + offsets.y * 2,
                 x: coordinates.x + offsets.x * 2,
@@ -58,7 +58,7 @@ class App extends React.Component {
       let switchTurn = true;
       board[coordinates.y][coordinates.x] = board[this.state.movingFrom.y][this.state.movingFrom.x];
       board[this.state.movingFrom.y][this.state.movingFrom.x] = "";
-      if (Math.abs(this.state.movingFrom.y - coordinates.y) !== 1) {
+      if (Math.abs(this.state.movingFrom.y - coordinates.y) !== 1) { // If piece is being captured
         switchTurn = false;
         board[(this.state.movingFrom.y + coordinates.y) / 2][
           (this.state.movingFrom.x + coordinates.x) / 2
@@ -69,7 +69,7 @@ class App extends React.Component {
         board[coordinates.y][coordinates.x] = `${board[coordinates.y][coordinates.x].substr(
           0,
           1,
-        )}K`;
+        )}K`; // K gets added for king pieces: WK = White King BK = Black King
       }
       if (switchTurn) {
         this.setState({ turn: this.state.turn === "W" ? "B" : "W" });
@@ -78,7 +78,7 @@ class App extends React.Component {
     } else if (
       this.state.movingFrom.y === coordinates.y &&
       this.state.movingFrom.x === coordinates.x
-    ) {
+    ) { // Deselect a currently selected piece
       this.setState({ movingFrom: null, validMoves: [] });
     }
   };

@@ -26,3 +26,11 @@
   background-color: white;
   font-size: 35px;
 }
+
+.info {
+  font-size: large;
+  display: grid;
+  grid-template-columns: repeat(2, 320px);
+  grid-gap: 0px;
+  font-size: 30px;
+}

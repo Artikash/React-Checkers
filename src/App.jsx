@@ -1,80 +1,93 @@
 import React from "react";
 import Square from "./Square";
+import Coordinates from "./Coordinates";
+import Board from "./Board";
 import StartingPosition from "./StartingPosition";
 
 class App extends React.Component {
   state = {
-    board: StartingPosition,
+    board: new Board(StartingPosition),
     selectedPieceCoords: null,
     validMoves: [],
     turn: "W",
   };
 
+  onClick = (coordinates) => {
+    if (!this.state.selectedPieceCoords) {
+      if (this.state.board.getAt(coordinates).match(this.state.turn)) {
+        this.selectPiece(coordinates);
+      }
+    } else if (this.isValidMoveOfSelectedPiece(coordinates)) {
+      this.movePiece(this.state.selectedPieceCoords, coordinates);
+    } else if (coordinates.equals(this.state.selectedPieceCoords)) {
+      this.deselectPiece();
+    }
+  };
+
   isValidMoveOfSelectedPiece = coordinates =>
     // Return value: whether the input move is valid
     this.state.validMoves.reduce(
-      (a, v) => a || (v.y === coordinates.y && v.x === coordinates.x),
+      (acccumulator, move) => acccumulator || move.equals(coordinates),
       false,
     );
 
-  gameWinner = () => {
-    // Return value: null if game in progress, an array with just the winning color otherwise
-    const winner = this.state.board
-      .map(row => row.map(piece => piece.substr(0, 1)).join(""))
-      .join("")
-      .match(/^([BW])\1*$/);
-    return winner ? winner[1] : winner;
-  };
-
-  computeValidMoves = (pieceCoords) => {
+  validMovesOfPiece = (pieceCoords) => {
     // Return value: array of valid moves for piece at pieceCoords
-    const computeMove = (offsets) => {
+    const computeMove = (offset) => {
       try {
         // Try catch in case we access a value off the board
-        if (this.state.board[pieceCoords.y + offsets.y][pieceCoords.x + offsets.x] === "") {
-          return { y: pieceCoords.y + offsets.y, x: pieceCoords.x + offsets.x };
+        if (this.state.board.getAt(pieceCoords.add(offset)) === "") {
+          return pieceCoords.add(offset);
         } else if (
-          !this.state.board[pieceCoords.y + offsets.y][pieceCoords.x + offsets.x].match(this.state.turn) &&
-          this.state.board[pieceCoords.y + offsets.y * 2][pieceCoords.x + offsets.x * 2] === ""
+          !this.state.board.getAt(pieceCoords.add(offset))
+            .match(this.state.turn) &&
+          this.state.board.getAt(pieceCoords.add(offset).add(offset)) === ""
         ) {
           // If a piece can be captured
-          return { y: pieceCoords.y + offsets.y * 2, x: pieceCoords.x + offsets.x * 2 };
+          return pieceCoords.add(offset).add(offset);
         }
-        return null;
+        return new Coordinates();
       } catch (error) {
-        return null;
+        return new Coordinates();
       }
     };
-    if (this.state.board[pieceCoords.y][pieceCoords.x].match("K")) {
+    if (this.state.board.getAt(pieceCoords).match("K")) {
       return [
-        computeMove({ y: +1, x: +1 }),
-        computeMove({ y: +1, x: -1 }),
-        computeMove({ y: -1, x: +1 }),
-        computeMove({ y: -1, x: -1 }),
-      ].filter(v => v !== null);
+        computeMove(new Coordinates(+1, +1)),
+        computeMove(new Coordinates(-1, +1)),
+        computeMove(new Coordinates(+1, -1)),
+        computeMove(new Coordinates(-1, -1)),
+      ];
     }
-    if (this.state.board[pieceCoords.y][pieceCoords.x] === "W") {
-      return [computeMove({ y: -1, x: +1 }), computeMove({ y: -1, x: -1 })].filter(v => v !== null);
+    if (this.state.board.getAt(pieceCoords) === "W") {
+      return [computeMove(new Coordinates(-1, -1)), computeMove(new Coordinates(+1, -1))];
     }
-    if (this.state.board[pieceCoords.y][pieceCoords.x] === "B") {
-      return [computeMove({ y: +1, x: +1 }), computeMove({ y: +1, x: -1 })].filter(v => v !== null);
+    if (this.state.board.getAt(pieceCoords) === "B") {
+      return [computeMove(new Coordinates(-1, +1)), computeMove(new Coordinates(+1, +1))];
     }
     return [];
   };
 
+  gameWinner = () =>
+    // Return value: null if game in progress, an array with just the winning color otherwise
+    this.state.board.contents
+      .map(row => row.map(piece => piece.substr(0, 1)).join(""))
+      .join("")
+      .match(/^([BW])\1*$/);
+
   movePiece = (initCoords, finalCoords) => {
-    const board = this.state.board.slice();
+    const board = Object.assign({}, this.state.board);
     let captured = false;
-    board[finalCoords.y][finalCoords.x] = board[initCoords.y][initCoords.x];
-    board[initCoords.y][initCoords.x] = "";
+    board.setAt(finalCoords, board.getAt(initCoords));
+    board.setAt(initCoords, "");
     if (Math.abs(finalCoords.y - initCoords.y) === 2) {
       // If piece is being captured
       captured = true;
-      board[(finalCoords.y + initCoords.y) / 2][(finalCoords.x + initCoords.x) / 2] = "";
+      board.setAt(initCoords.midpoint(finalCoords), "");
     }
     if (finalCoords.y === 0 || finalCoords.y === 7) {
       // K gets added for king pieces: WK = White King BK = Black King
-      board[finalCoords.y][finalCoords.x] = `${this.state.turn}K`;
+      board.setAt(finalCoords, `${this.state.turn}K`);
     }
     this.setState({ board });
     if (!captured) {
@@ -86,27 +99,12 @@ class App extends React.Component {
   selectPiece = (coordinates) => {
     this.setState({
       selectedPieceCoords: coordinates,
-      validMoves: this.computeValidMoves(coordinates),
+      validMoves: this.validMovesOfPiece(coordinates),
     });
   };
 
   deselectPiece = () => {
     this.setState({ selectedPieceCoords: null, validMoves: [] });
-  };
-
-  clickHandler = (coordinates) => {
-    if (!this.state.selectedPieceCoords) {
-      if (this.state.board[coordinates.y][coordinates.x].match(this.state.turn)) {
-        this.selectPiece(coordinates);
-      }
-    } else if (this.isValidMoveOfSelectedPiece(coordinates)) {
-      this.movePiece(this.state.selectedPieceCoords, coordinates);
-    } else if (
-      this.state.selectedPieceCoords.y === coordinates.y &&
-      this.state.selectedPieceCoords.x === coordinates.x
-    ) {
-      this.deselectPiece();
-    }
   };
 
   render = () => (
@@ -115,23 +113,22 @@ class App extends React.Component {
         <h1 className="App-title">Checkers in React.js</h1>
       </header>
       <div className="Game">
-        {this.state.board.map((row, y) =>
+        {this.state.board.contents.map((row, y) =>
           row.map((piece, x) => (
             <Square
               piece={piece}
               movingFrom={
                 this.state.selectedPieceCoords &&
-                x === this.state.selectedPieceCoords.x &&
-                y === this.state.selectedPieceCoords.y
+                this.state.selectedPieceCoords.equals(new Coordinates(x, y))
               }
-              coords={{ y, x }}
-              handleClick={this.clickHandler}
-              validMove={this.isValidMoveOfSelectedPiece({ y, x })}
+              coords={new Coordinates(x, y)}
+              onClick={this.onClick}
+              validMove={this.isValidMoveOfSelectedPiece(new Coordinates(x, y))}
             />
           )))}
         <div className="info">
           <div>{`To move: ${this.state.turn}`}</div>
-          <div>{`Winner: ${this.gameWinner() ? this.gameWinner() : "Undecided"}`}</div>
+          <div>{`Winner: ${this.gameWinner() ? this.gameWinner()[1] : "Undecided"}`}</div>
         </div>
       </div>
     </div>

@@ -31,7 +31,7 @@ class App extends React.Component {
       false,
     );
 
-  validMovesOfPiece = (pieceCoords) => {
+  validMovesOfPiece = (pieceCoords = new Coordinates()) => {
     // Return value: array of valid moves for piece at pieceCoords
     const computeMove = (offset) => {
       try {
@@ -39,8 +39,7 @@ class App extends React.Component {
         if (this.state.board.getAt(pieceCoords.add(offset)) === "") {
           return pieceCoords.add(offset);
         } else if (
-          !this.state.board.getAt(pieceCoords.add(offset))
-            .match(this.state.turn) &&
+          !this.state.board.getAt(pieceCoords.add(offset)).match(this.state.turn) &&
           this.state.board.getAt(pieceCoords.add(offset).add(offset)) === ""
         ) {
           // If a piece can be captured

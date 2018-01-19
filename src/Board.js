@@ -1,5 +1,5 @@
 class Board {
-  constructor(StartingPosition) {
+  constructor(StartingPosition = [[""]]) {
     this.contents = StartingPosition;
   }
 

@@ -116,7 +116,7 @@ class App extends React.Component {
           row.map((piece, x) => (
             <Square
               piece={piece}
-              movingFrom={
+              selected={
                 this.state.selectedPieceCoords &&
                 this.state.selectedPieceCoords.equals(new Coordinates(x, y))
               }

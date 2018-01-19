@@ -27,7 +27,7 @@ class App extends React.Component {
   isValidMoveOfSelectedPiece = coordinates =>
     // Return value: whether the input move is valid
     this.state.validMoves.reduce(
-      (acccumulator, move) => acccumulator || move.equals(coordinates),
+      (accumulator, move) => accumulator || move.equals(coordinates),
       false,
     );
 

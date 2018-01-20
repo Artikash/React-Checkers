@@ -1,7 +1,7 @@
 class Coordinates {
   constructor(x, y) {
-    this.x = +x;
-    this.y = +y;
+    this.x = x;
+    this.y = y;
   }
 
   midpoint = otherCoords =>

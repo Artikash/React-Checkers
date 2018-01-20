@@ -17,14 +17,14 @@ class App extends React.Component {
       if (this.state.board.getAt(coordinates).match(this.state.turn)) {
         this.selectPiece(coordinates);
       }
-    } else if (this.isValidMoveOfSelectedPiece(coordinates)) {
+    } else if (this.isValidMove(coordinates)) {
       this.movePiece(this.state.selectedPieceCoords, coordinates);
     } else if (coordinates.equals(this.state.selectedPieceCoords)) {
       this.deselectPiece();
     }
   };
 
-  isValidMoveOfSelectedPiece = coordinates =>
+  isValidMove = coordinates =>
     // Return value: whether the input move is valid
     this.state.validMoves.reduce(
       (accumulator, move) => accumulator || move.equals(coordinates),
@@ -122,7 +122,7 @@ class App extends React.Component {
               }
               coords={new Coordinates(x, y)}
               onClick={this.onClick}
-              validMove={this.isValidMoveOfSelectedPiece(new Coordinates(x, y))}
+              validMove={this.isValidMove(new Coordinates(x, y))}
             />
           )))}
         <div className="info">

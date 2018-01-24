@@ -1,15 +1,17 @@
 class Coordinates {
-  constructor(x, y) {
+  constructor(x = NaN, y = NaN) {
     this.x = x;
     this.y = y;
   }
 
-  midpoint = otherCoords =>
+  add = (otherCoords = new Coordinates()) =>
+    new Coordinates(this.x + otherCoords.x, this.y + otherCoords.y);
+
+  midpoint = (otherCoords = new Coordinates()) =>
     new Coordinates((this.x + otherCoords.x) / 2, (this.y + otherCoords.y) / 2);
 
-  add = otherCoords => new Coordinates(this.x + otherCoords.x, this.y + otherCoords.y);
-
-  equals = otherCoords => this.x === otherCoords.x && this.y === otherCoords.y;
+  equals = (otherCoords = new Coordinates()) =>
+    this.x === otherCoords.x && this.y === otherCoords.y;
 }
 
 export default Coordinates;

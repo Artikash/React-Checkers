@@ -12,7 +12,7 @@ class App extends React.Component {
     turn: "W",
   };
 
-  onClick = (coordinates) => {
+  onClick = (coordinates = new Coordinates()) => {
     if (!this.state.selectedPieceCoords) {
       if (this.state.board.getAt(coordinates).match(this.state.turn)) {
         this.selectPiece(coordinates);
@@ -24,7 +24,7 @@ class App extends React.Component {
     }
   };
 
-  isValidMove = coordinates =>
+  isValidMove = (coordinates = new Coordinates()) =>
     // Return value: whether the input move is valid
     this.state.validMoves.reduce(
       (accumulator, move) => accumulator || move.equals(coordinates),
@@ -33,7 +33,7 @@ class App extends React.Component {
 
   validMovesOfPiece = (pieceCoords = new Coordinates()) => {
     // Return value: array of valid moves for piece at pieceCoords
-    const computeMove = (offset) => {
+    const computeMove = (offset = new Coordinates()) => {
       try {
         // Try catch in case we access a value off the board
         if (this.state.board.getAt(pieceCoords.add(offset)) === "") {
@@ -74,7 +74,7 @@ class App extends React.Component {
       .join("")
       .match(/^([BW])\1*$/);
 
-  movePiece = (initCoords, finalCoords) => {
+  movePiece = (initCoords = new Coordinates(), finalCoords = new Coordinates()) => {
     const board = Object.assign({}, this.state.board);
     let captured = false;
     board.setAt(finalCoords, board.getAt(initCoords));
@@ -95,7 +95,7 @@ class App extends React.Component {
     this.deselectPiece();
   };
 
-  selectPiece = (coordinates) => {
+  selectPiece = (coordinates = new Coordinates()) => {
     this.setState({
       selectedPieceCoords: coordinates,
       validMoves: this.validMovesOfPiece(coordinates),
